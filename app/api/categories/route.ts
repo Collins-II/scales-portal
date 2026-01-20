@@ -1,26 +1,24 @@
-// app/api/admin/categories/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Category from "@/lib/database/models/category";
 import { connectToDatabase } from "@/lib/database";
-import { getCurrentUser } from "@/app/actions/getCurrentUser";
-import ScaleProduct from "@/lib/database/models/scales_product";
+// import { getCurrentUser } from "@/app/actions/getCurrentUser";
 
 /* ------------------------------------------------------------
    🔐 CORS CONFIG
 ------------------------------------------------------------ */
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*", // 🔒 tighten in prod if needed
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 /* ------------------------------------------------------------
-   🧠 OPTIONS (Preflight)
+   🧠 OPTIONS
 ------------------------------------------------------------ */
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
-    headers: CORS_HEADERS
+    headers: CORS_HEADERS,
   });
 }
 
@@ -31,28 +29,31 @@ export async function GET() {
   try {
     await connectToDatabase();
 
-    const scales = (await ScaleProduct.find()
-      .select("_id scaleType image slug")
-      .lean()) || [];
+    const categories = await Category.find()
+      .select("_id name slug image icon parent description createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
 
-    // Ensure we always return an array
-    const formatted = Array.isArray(scales)
-      ? scales.map(scale => ({
-          _id: String(scale._id),
-          name: scale.scaleType,
-          image: scale.image || undefined
-        }))
-      : [];
+    const formatted = categories.map((cat) => ({
+      _id: String(cat._id),
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description || "",
+      parent: cat.parent ? String(cat.parent) : null,
+      image: cat.image || undefined,
+      icon: cat.icon || undefined,
+      visualType: cat.icon ? "icon" : cat.image ? "image" : null,
+    }));
 
     return NextResponse.json(formatted, {
       status: 200,
-      headers: CORS_HEADERS
+      headers: CORS_HEADERS,
     });
   } catch (error) {
-    console.error("[ADMIN_SCALE_PRODUCTS_GET]", error);
+    console.error("[ADMIN_CATEGORIES_GET]", error);
 
     return NextResponse.json(
-      { error: "Failed to fetch scale products" },
+      { error: "Failed to fetch categories" },
       { status: 500, headers: CORS_HEADERS }
     );
   }
@@ -63,17 +64,25 @@ export async function GET() {
 ------------------------------------------------------------ */
 export async function POST(req: NextRequest) {
   try {
-   /* const user = await getCurrentUser();
-
+    /*
+    const user = await getCurrentUser();
     if (!user || user.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401, headers: CORS_HEADERS }
       );
-    }*/
+    }
+    */
 
     const body = await req.json();
-    const { name, slug, description, parent } = body;
+    const {
+      name,
+      slug,
+      description,
+      parent,
+      image,
+      icon,
+    } = body;
 
     if (!name?.trim() || !slug?.trim()) {
       return NextResponse.json(
@@ -82,10 +91,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Enforce single visual type
+    if (image && icon) {
+      return NextResponse.json(
+        { error: "Category can have either an image or an icon, not both" },
+        { status: 400, headers: CORS_HEADERS }
+      );
+    }
+
     await connectToDatabase();
 
-    // Prevent duplicate slugs
-    const exists = await Category.findOne({ slug });
+    const exists = await Category.findOne({ slug: slug.trim() });
     if (exists) {
       return NextResponse.json(
         { error: "Category slug already exists" },
@@ -97,13 +113,24 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       slug: slug.trim(),
       description: description?.trim() || "",
-      parent: parent || null
+      parent: parent || null,
+      image: image || undefined,
+      icon: icon || undefined,
     });
 
-    return NextResponse.json(category, {
-      status: 201,
-      headers: CORS_HEADERS
-    });
+    return NextResponse.json(
+      {
+        _id: String(category._id),
+        name: category.name,
+        slug: category.slug,
+        image: category.image,
+        icon: category.icon,
+      },
+      {
+        status: 201,
+        headers: CORS_HEADERS,
+      }
+    );
   } catch (error) {
     console.error("[ADMIN_CATEGORIES_POST]", error);
 

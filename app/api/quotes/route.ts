@@ -1,3 +1,5 @@
+import { Quote } from "@/lib/database/models/quote";
+import { sendQuoteEmail } from "@/lib/email";
 import { NextRequest, NextResponse } from "next/server";
 
 /* ------------------------------------------------------------------
@@ -45,7 +47,8 @@ export async function POST(req: NextRequest) {
   const origin = req.headers.get("origin");
 
   try {
-    const body = await req.json();
+  const body = await req.json()
+  console.log("QUOTE_CREATED")
 
     const {
       productId,
@@ -54,57 +57,44 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       message,
-    } = body ?? {};
+    } = body
 
-    /* -------------------- Validation -------------------- */
-    if (
-      !productId ||
-      !name ||
-      !email ||
-      !phone ||
-      typeof email !== "string"
-    ) {
+    if (!name || !email || !phone) {
       return NextResponse.json(
-        { error: "Invalid or missing fields" },
-        {
-          status: 400,
-          headers: corsHeaders(origin),
-        }
-      );
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
     }
 
-    /* -------------------- Persist / Notify -------------------- */
-    // TODO:
-    // - Save to DB
-    // - Send email (Resend / Nodemailer)
-    // - Push to CRM / Slack
-
-    console.log("📩 NEW QUOTE REQUEST", {
+    const quote = await Quote.create({
       productId,
       productName,
       name,
       email,
       phone,
       message,
-      timestamp: new Date().toISOString(),
-    });
+    })
+
+    // OPTIONAL: trigger email / Slack / WhatsApp
+    await sendQuoteEmail({
+      productName,
+      name,
+      email,
+      phone,
+      message,
+    })
+
 
     return NextResponse.json(
-      { success: true },
-      {
-        status: 200,
-        headers: corsHeaders(origin),
-      }
-    );
+      { success: true, quoteId: quote._id },
+      { status: 201 }
+    )
   } catch (error) {
-    console.log("[QUOTE_REQUEST_ERROR]", error);
+    console.error("QUOTE_API_ERROR:", error)
 
     return NextResponse.json(
       { error: "Internal server error" },
-      {
-        status: 500,
-        headers: corsHeaders(origin),
-      }
-    );
+      { status: 500 }
+    )
   }
 }

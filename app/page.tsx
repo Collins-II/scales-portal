@@ -8,21 +8,18 @@ import Link from "next/link";
 
 export default function AdminLandingPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-3 md:p-8">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-10"
       >
-        <h1 className="text-3xl font-bold tracking-tight">Premier Scales Admin Portal</h1>
-        <p className="text-gray-600 mt-2">
-          Manage categories, products, audits, and system operations securely.
-        </p>
+        <h1 className="text-2xl font-bold tracking-tight text-red-600">Quick Links</h1>
       </motion.header>
 
       {/* Quick Actions */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
         <AdminCard
           title="Category Management"
           description="Create, edit, nest, and organize scale categories"
@@ -70,27 +67,77 @@ function AdminCard({
   icon,
   href,
 }: {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  href: string;
+  title: string
+  description: string
+  icon: React.ReactNode
+  href: string
 }) {
   return (
-    <motion.div whileHover={{ scale: 1.02 }}>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className="h-full"
+    >
       <Card className="h-full">
-        <CardContent className="p-6 flex flex-col gap-4">
-          <div className="flex items-center gap-3 text-primary">
-            <div className="p-2 rounded-xl bg-primary/10">{icon}</div>
-            <h2 className="font-semibold text-lg">{title}</h2>
+        <CardContent
+          className="
+            p-4 sm:p-5 md:p-6
+            flex flex-col gap-3 sm:gap-4
+            h-full
+          "
+        >
+          {/* Header */}
+          <div className="flex items-center gap-3">
+            <div
+              className="
+                p-2 sm:p-2.5
+                rounded-lg sm:rounded-xl
+                bg-primary/10
+                text-red-500
+                shrink-0
+              "
+            >
+              {icon}
+            </div>
+
+            <h2
+              className="
+                font-semibold
+                text-base sm:text-lg
+                leading-tight
+              "
+            >
+              {title}
+            </h2>
           </div>
 
-          <p className="text-gray-600 text-sm flex-1">{description}</p>
+          {/* Description */}
+          <p
+            className="
+              text-gray-600
+              text-xs sm:text-sm
+              leading-relaxed
+              flex-1
+            "
+          >
+            {description}
+          </p>
 
-          <Link href={href}>
-            <Button className="w-full">Open</Button>
+          {/* Action */}
+          <Link href={href} className="mt-auto">
+            <Button
+              className="
+                w-full
+                h-9 sm:h-10
+                text-sm
+                bg-red-500
+              "
+            >
+              Open
+            </Button>
           </Link>
         </CardContent>
       </Card>
     </motion.div>
-  );
+  )
 }

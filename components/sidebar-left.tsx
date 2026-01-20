@@ -2,141 +2,118 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
+  Package,
+  Layers,
+  Image as ImageIcon,
+  ShoppingCart,
+  Users,
+  BarChart3,
   Settings2,
-  SquareTerminal,
+  LifeBuoy,
+  Send,
+  Command,
 } from "lucide-react"
 
-import { NavFavorites } from "@/components/nav-favorites"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
-import { NavWorkspaces } from "@/components/nav-workspaces"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { DatePicker } from "@/components/date-picker"
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { NavProjects } from "./nav-projects"
 import Link from "next/link"
 import Image from "next/image"
+import { Separator } from "./ui/separator"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "Mohsin Patel",
-    email: "m@patel.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Premier Scales",
-      logo: Command,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
+/* --------------------------------
+   Premier Admin Navigation
+-------------------------------- */
+const adminData = {
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
+      title: "Dashboard",
+      url: "/",
+      icon: BarChart3,
     },
     {
-      title: "Data Manager",
-      url: "/data-section",
-      icon: Bot,
+      title: "Catalog",
+      url: "/admin/products",
+      icon: Package,
       items: [
         {
           title: "Products",
-          url: "/Products",
+          url: "/admin/products",
         },
         {
           title: "Categories",
-          url: "/Categories",
-        },
-        {
-          title: "Quantum",
-          url: "#",
+          url: "/admin/categories",
         },
       ],
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
+      title: "Content",
+      url: "/admin/banners",
+      icon: ImageIcon,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Hero Section",
+          url: "/admin/heros",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Banners",
+          url: "/admin/banners",
         },
         {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
+          title: "Market Sectors",
+          url: "/admin/sectors",
         },
       ],
     },
     {
-      title: "Settings",
-      url: "#",
+      title: "Orders",
+      url: "/admin/orders",
+      icon: ShoppingCart,
+      items: [
+        {
+          title: "All Orders",
+          url: "/admin/orders",
+        },
+        {
+          title: "Quotations",
+          url: "/admin/quotes",
+        },
+      ],
+    },
+    {
+      title: "Users",
+      url: "/admin/users",
+      icon: Users,
+      items: [
+        {
+          title: "Admins",
+          url: "/admin/users/admins",
+        },
+        {
+          title: "Customers",
+          url: "/admin/users/customers",
+        },
+      ],
+    },
+    {
+      title: "System",
+      url: "/admin/settings",
       icon: Settings2,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "General Settings",
+          url: "/admin/settings",
         },
         {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Audit Logs",
+          url: "/admin/audit-logs",
         },
       ],
     },
@@ -144,57 +121,53 @@ const data = {
   navSecondary: [
     {
       title: "Support",
-      url: "#",
+      url: "/admin/support",
       icon: LifeBuoy,
     },
     {
       title: "Feedback",
-      url: "#",
+      url: "/admin/feedback",
       icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
     },
   ],
 }
 
-export function SidebarLeft({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
+/* --------------------------------
+   Sidebar Component
+-------------------------------- */
+export function SidebarLeft(
+  props: React.ComponentProps<typeof Sidebar>
+) {
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
-         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-         <Image
+        {/* Logo */}
+        <Link
+          href="/"
+          className="w-full flex justify-center items-center py-4"
+        >
+          <Image
             src="/logo/zm_logo.jpeg"
-            alt="Premier-Scales"
-            width={60}
+            alt="Premier Scales Admin"
+            width={150}
             height={60}
-            className="rounded-xs object-contain"
-          /> 
+            className="object-contain"
+            priority
+          />
         </Link>
-        {/*<TeamSwitcher teams={data.teams} />*/}
-        <NavMain items={data.navMain} />
+      <Separator className="h-[12px]" />
+        <NavMain items={adminData.navMain} />
       </SidebarHeader>
+
       <SidebarContent>
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <DatePicker />
+        <SidebarSeparator className="mx-0 my-2" />
+        <NavSecondary
+          items={adminData.navSecondary}
+          className="mt-auto"
+        />
       </SidebarContent>
+
       <SidebarRail />
     </Sidebar>
   )

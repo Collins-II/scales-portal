@@ -48,7 +48,7 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="w-full max-w-6xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Products</h1>
@@ -85,11 +85,11 @@ export default function AdminProductsPage() {
 
       {/* List */}
       {!loading && products.length > 0 && (
-        <div className="space-y-4">
+        <div className="w-full space-y-4">
           {products.map((product) => (
             <div
               key={product._id}
-              className="flex items-center gap-4 border rounded p-4 bg-white"
+              className="flex flex-wrap items-center gap-4 border rounded p-4 bg-white"
             >
               {/* Image */}
               <div className="relative w-24 h-20 border rounded overflow-hidden bg-gray-50">
